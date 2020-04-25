@@ -69,13 +69,13 @@ export default {
             height: 100%;
         }
         & > .im-record {
-            width: 280px;
+            width: 23%
         }
         & > .im-chat {
-            width: calc(~'99% - 680px');
+            width: 47%
         }
         & > .im-member{
-            width:410px;
+            width: 29%
         }
     }
 }
