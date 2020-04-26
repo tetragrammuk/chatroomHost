@@ -503,6 +503,7 @@ export const imServerStore = new Vuex.Store({
         sendMsg: function(context, { clientChatId, msg }) {
             console.log(clientChatId);
             context.state.socket.emit('SERVER_SEND_MSG', {
+                serverChatId: context.state.serverChatEn.serverChatId,
                 clientChatId: clientChatId,
                 msg: msg
             });
