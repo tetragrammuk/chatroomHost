@@ -471,7 +471,7 @@ export const imServerStore = new Vuex.Store({
                     console.log('other server send messanger');
                     console.log(data)
                     context.dispatch('addChatMsg', {
-                        clientChatId: data.clientChatEn.clientChatId,
+                        clientChatId: data.clientChatId,
                         msg: data.msg
                     });
                 });
