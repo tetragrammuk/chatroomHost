@@ -466,6 +466,15 @@ export const imServerStore = new Vuex.Store({
                         msg: data.msg
                     });
                 });
+                // 其他客服端发送了信息
+                context.state.socket.on('SERVER_SEND_MSG', function(data) {
+                    console.log('other server send messanger');
+                    console.log(data)
+                    context.dispatch('addChatMsg', {
+                        clientChatId: data.clientChatEn.clientChatId,
+                        msg: data.msg
+                    });
+                });
 
                 // 离开
                 window.addEventListener('beforeunload', () => {
