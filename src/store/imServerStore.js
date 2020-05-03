@@ -545,7 +545,7 @@ export const imServerStore = new Vuex.Store({
         SERVER_ON: function (context, payload) {
             // context.state.socket = require('socket.io-client')('http://127.0.0.1:3001');
             //41add
-            context.commit('SOCKET_REQ', require('socket.io-client')('http://theflowchat.com:3001'))
+            context.commit('SOCKET_REQ', require('socket.io-client')('https://theflowchat.com:3001'))
             context.state.socket.on('connect', function () {
                 // 服务端上线
                 context.state.socket.emit('SERVER_ON', {
