@@ -57,13 +57,13 @@ export default {
     },
     methods: {
         done_change: function(){
-                this.$store.imServerStore.commit('done_change', {
+                this.$store.imServerStore.dispatch('done_change', {
                 storeSelectedChatEn: this.storeSelectedChatEn
             });
         },
 
         non_done_change: function(){
-                this.$store.imServerStore.commit('non_done_change', {
+                this.$store.imServerStore.dispatch('non_done_change', {
                 storeSelectedChatEn: this.storeSelectedChatEn
             });
         },

@@ -5,11 +5,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import ak from '@/common/ak.js';
-import axios from 'axios';
+
 Vue.use(Vuex);
 export const imServerStore = new Vuex.Store({
-    //41add
-    // strict: true,
     state: {
         serverChatEn: {
             serverChatId: 'ieat',
@@ -28,14 +26,14 @@ export const imServerStore = new Vuex.Store({
          * 触发当前选择的chat含有新的消息
          * @param {Object} payload 载荷对象
          */
-        triggerHaveNewMsgDelegate: function (state, payload) {
+        triggerHaveNewMsgDelegate: function(state, payload) {
             state.haveNewMsgDelegate = Date.now();
         },
 
         /**
          * 排序当前会话列表
          */
-        sortCurrentChatEnlist: function (state, payload) {
+        sortCurrentChatEnlist: function(state, payload) {
             var enlist = state.currentChatEnlist.concat();
 
             // 排序规则：
@@ -74,85 +72,42 @@ export const imServerStore = new Vuex.Store({
         /**
          * 清除通知chat
          */
-        clearNotificationChat: function (state) {
+        clearNotificationChat: function(state) {
             state.notificationChatEnlist = [];
-        },
-        // 新增處理狀態的轉換
-        //41add
-        done_change: function (state, { storeSelectedChatEn }) {
-            state.currentChatEnlist_done.push(storeSelectedChatEn);
-
-            var result = state.currentChatEnlist.map(function (item, index) {
-                return item.clientChatId;
-            }).indexOf(state.selectedChatEn.clientChatId);
-            state.currentChatEnlist.splice(result, 1);
-
-            console.log(state.currentChatEnlist_done)
-            console.log(state.currentChatEnlist)
-            console.log(state.currentChatEnlist_done.indexOf(state.selectedChatEn));
-        },
-        //41add
-        non_done_change: function (state, { storeSelectedChatEn }) {
-            state.currentChatEnlist.push(storeSelectedChatEn);
-
-            var result = state.currentChatEnlist_done.map(function (item, index) {
-                return item.clientChatId;
-            }).indexOf(state.selectedChatEn.clientChatId);
-            state.currentChatEnlist_done.splice(result, 1);
-
-            console.log(state.currentChatEnlist_done)
-            console.log(state.currentChatEnlist)
-        },
-        //41add
-        ClientChat_ADD: function (state, data) {
-            state.currentChatEnlist.push(data);
-        },
-        //41add
-        ChatEn_UPDATE: function (state, data) {
-            state.selectedChatEn = data;
-        },
-        //41add
-        ChatEnlist_UPDATE: function (state, data) {
-            state.currentChatEnlist[data] = state.selectedChatEn;
-        },
-        //41add
-        noti_DELETE_i: function (state, data) {
-            state.notificationChatEnlist.splice(data, 1);
-        },
-        //41add
-        noti_DELETE: function (state, data) {
-            state.notificationChatEnlist = state.notificationChatEnlist.splice(data);
-        },
-        //state.notificationChatEnlist.push(tmpChatEn);
-        //41add
-        noti_ADD: function (state, data) {
-            state.notificationChatEnlist.push(data);
-        },
-        //41add
-        SOCKET_REQ: function (state, data) {
-            state.socket = data;
-        },
-        // context.state.socket = null;
-        //41add
-        SOCKET_NULL: function (state) {
-            state.socket = null;
-        },
-        UPDATE_CHATLIST: function (state, data) {
-            state.currentChatEnlist = data;
-        },
-        UPDATE_CHATLIST_DONE: function (state, data) {
-            state.currentChatEnlist_done = data;
-        },
+        }
     },
     actions: {
 
+        // 新增處理狀態的轉換
+        done_change: function(context,{ storeSelectedChatEn }){
+            context.state.currentChatEnlist_done.push(storeSelectedChatEn);
 
+            var result = context.state.currentChatEnlist.map(function(item, index) {
+                return item.clientChatId;
+            }).indexOf(context.state.selectedChatEn.clientChatId);
+            context.state.currentChatEnlist.splice(result,1);  
+
+            console.log(context.state.currentChatEnlist_done)
+            console.log(context.state.currentChatEnlist)
+            console.log(context.state.currentChatEnlist_done.indexOf(context.state.selectedChatEn));
+        },
+        non_done_change: function(context,{ storeSelectedChatEn }){
+            context.state.currentChatEnlist.push(storeSelectedChatEn);  
+            
+            var result = context.state.currentChatEnlist_done.map(function(item, index) {
+                return item.clientChatId;
+            }).indexOf(context.state.selectedChatEn.clientChatId);
+            context.state.currentChatEnlist_done.splice(result,1);  
+        
+            console.log(context.state.currentChatEnlist_done)
+            console.log(context.state.currentChatEnlist)
+        },
         /**
          * 添加访客端chat对象
          * @param {Object} payload 载荷对象
          * @param {String} payload.newChatEn 新的chat对象
          */
-        addClientChat: function (context, { newChatEn }) {
+        addClientChat: function(context, { newChatEn }) {
             context.dispatch('getChatEnByChatId', { clientChatId: newChatEn.clientChatId }).then((chatEn) => {
                 if (chatEn == null) {
                     // 1)公共属性
@@ -164,28 +119,18 @@ export const imServerStore = new Vuex.Store({
                     newChatEn.isFollow = false; // 是否关注
                     newChatEn.lastMsgTime = null;
                     newChatEn.lastMsgShowTime = null; // 最后一个消息的显示时间
-                    //context.state.currentChatEnlist.push(newChatEn);
-                    //41add
-                    context.commit('ClientChat_ADD', newChatEn);
-
-                    axios({
-                        method: "post",
-                        url: "https://theflowchat.com:3000/api/ChatEn_update",
-                        data: {
-                            serverChatId: context.state.serverChatEn.serverChatId,
-                            ChatEnList: context.state.currentChatEnlist,
-                            done_ChatEnList: context.state.currentChatEnlist_done
-                        },
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    }).then(response => {
-                        console.log(response)
-                    })
+                    context.state.currentChatEnlist.push(newChatEn);
                 }
 
                 // 2)增加消息
-                //41add
+                context.dispatch('addChatMsg', {
+                    clientChatId: newChatEn.clientChatId,
+                    msg: {
+                        role: 'sys',
+                        contentType: 'text',
+                        content: chatEn == null ? '新客户接入' : '重新连接'
+                    }
+                });
             });
         },
         /**
@@ -193,7 +138,7 @@ export const imServerStore = new Vuex.Store({
          * @param {String} clientChatId 需要修改的chatEn的id，根据此id匹配当前集合或历史集合
          * @param {String} listName 指定的集合名称；e.g. currentChatEnlist、historyChatEnlist、allHistoryChatEnlist
          */
-        getChatEnByChatId: function (context, { clientChatId, listName }) {
+        getChatEnByChatId: function(context, { clientChatId, listName }) {
             var chatEn = null;
 
             if (listName) {
@@ -234,7 +179,7 @@ export const imServerStore = new Vuex.Store({
          * @param {Object} payload.clientChatId 需要修改的chatEn的id，根据此id匹配当前集合或历史集合
          * @param {Array} payload.extends Chat需要变更的属性对象数组
          */
-        extendChatEn: function (context, payload) {
+        extendChatEn: function(context, payload) {
             return context.dispatch('getChatEnByChatId', { clientChatId: payload.clientChatId }).then((chatEn) => {
                 // 1.若没有，就附加到当前会话列表里
                 if (chatEn == null) {
@@ -248,10 +193,8 @@ export const imServerStore = new Vuex.Store({
 
                 // 3.若选中的当前chatEn 与 传入的一直，更新选中额chatEn
                 if (context.state.selectedChatEn && context.state.selectedChatEn.clientChatId == chatEn.clientChatId) {
-                    //context.state.selectedChatEn = Object.assign({}, chatEn);
-                    //41add
-                    context.commit('ChatEn_UPDATE', Object.assign({}, chatEn));
-                    Vue.nextTick(function () { });
+                    context.state.selectedChatEn = Object.assign({}, chatEn);
+                    Vue.nextTick(function() {});
                 }
                 return chatEn;
             });
@@ -266,7 +209,7 @@ export const imServerStore = new Vuex.Store({
          * @param {String} msg.content 消息内容
          * @param {Function} successCallback 添加消息后的回调
          */
-        addChatMsg: function (context, { clientChatId, msg, successCallback }) {
+        addChatMsg: function(context, { clientChatId, msg, successCallback }) {
             context.dispatch('getChatEnByChatId', { clientChatId: clientChatId }).then((chatEn) => {
                 if (chatEn == null) {
                     return;
@@ -314,10 +257,7 @@ export const imServerStore = new Vuex.Store({
                 // 更新列表
                 if (context.state.selectedChatEn && chatEn.clientChatId == context.state.selectedChatEn.clientChatId) {
                     chatEn.newMsgCount = 0;
-                    //context.state.selectedChatEn = Object.assign({}, chatEn);
-                    //41add
-                    context.commit('ChatEn_UPDATE', Object.assign({}, chatEn));
-
+                    context.state.selectedChatEn = Object.assign({}, chatEn);
                     context.commit('triggerHaveNewMsgDelegate');
                 } else {
                     chatEn.newMsgCount++;
@@ -325,30 +265,14 @@ export const imServerStore = new Vuex.Store({
 
                 // 4.排序
                 context.commit('sortCurrentChatEnlist', {});
-                //console.log(context.state.currentChatEnlist) 
-                // 41add api
-                axios({
-                    method: "post",
-                    url: "https://theflowchat.com:3000/api/ChatEn_update",
-                    data: {
-                        serverChatId: context.state.serverChatEn.serverChatId,
-                        ChatEnList: context.state.currentChatEnlist,
-                        done_ChatEnList: context.state.currentChatEnlist_done
-                    },
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }).then(response => {
-                    console.log(response)
-                })
 
                 // 5.加入通知
-                // if (msg.isNewMsg && msg.role == 'client' && msg.contentType != 'preInput') {
-                //     context.dispatch('addNotificationChat', {
-                //         chatEn: chatEn,
-                //         oprType: 'msg'
-                //     });
-                // }
+                if (msg.isNewMsg && msg.role == 'client' && msg.contentType != 'preInput') {
+                    context.dispatch('addNotificationChat', {
+                        chatEn: chatEn,
+                        oprType: 'msg'
+                    });
+                }
 
                 // 6.回调
                 successCallback && successCallback();
@@ -359,66 +283,22 @@ export const imServerStore = new Vuex.Store({
          * 选中会话
          * @param {String} clientChatId 选中会话Id
          */
-        selectChat: function (context, { clientChatId }) {
-            var state = context.state;
-
+        selectChat: function(context, { clientChatId }) {
             context.dispatch('getChatEnByChatId', { clientChatId: clientChatId }).then((chatEn) => {
-                //41add
-                axios({
-                    method: "post",
-                    url: "https://theflowchat.com:3000/api/msgList_read",
-                    data: {
-                        serverChatId: context.state.serverChatEn.serverChatId,
-                        clientChatId: clientChatId
-                    },
-                    headers: {
-                        "Content-Type": "application/json"
+
+                var state = context.state;
+                chatEn.newMsgCount = 0; // 设置新消息为0
+                // 1.设置当前选中的会话
+                context.state.selectedChatEn = Object.assign({}, chatEn);
+
+                // 2.刷新当前会话集合
+                for (var i = 0; i < state.currentChatEnlist.length; i++) {
+                    var tmpEn = state.currentChatEnlist[i];
+                    if (tmpEn.clientChatId == chatEn.clientChatId) {
+                        state.currentChatEnlist[i] = state.selectedChatEn;
+                        break;
                     }
-                }).then(response => {
-                    console.log(response);
-                    chatEn.msgList = response.data.msgList;
-
-                    //41add
-                    if (chatEn.newMsgCount) {
-                        chatEn.msgList.splice(chatEn.msgList.length - chatEn.newMsgCount, 0, {
-                            role: 'sys',
-                            contentType: 'text',
-                            content: '以下為新訊息'
-                        })
-                    }
-                    chatEn.newMsgCount = 0; // 设置新消息为0
-                    // 1.设置当前选中的会话
-                    //context.state.selectedChatEn = Object.assign({}, chatEn);
-                    //41add
-                    context.commit('ChatEn_UPDATE', Object.assign({}, chatEn));
-
-
-                    // 2.刷新当前会话集合
-                    for (var i = 0; i < state.currentChatEnlist.length; i++) {
-                        var tmpEn = state.currentChatEnlist[i];
-                        if (tmpEn.clientChatId == chatEn.clientChatId) {
-                            //state.currentChatEnlist[i] = state.selectedChatEn;
-                            //41add
-                            context.commit('ChatEnlist_UPDATE', i)
-                            break;
-                        }
-                    }
-                    axios({
-                        method: "post",
-                        url: "https://theflowchat.com:3000/api/ChatEn_update",
-                        data: {
-                            serverChatId: context.state.serverChatEn.serverChatId,
-                            ChatEnList: context.state.currentChatEnlist,
-                            done_ChatEnList: context.state.currentChatEnlist_done
-                        },
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    }).then(response => {
-                        console.log(response)
-                    })
-
-                });
+                }
             });
         },
 
@@ -427,7 +307,7 @@ export const imServerStore = new Vuex.Store({
          * @param {Object} chatEn 会话对象
          * @param {String} oprType 操作类型；eg：chat(添加会话)、msg(添加消息)
          */
-        addNotificationChat: function (context, { chatEn, oprType }) {
+        addNotificationChat: function(context, { chatEn, oprType }) {
             var state = context.state;
             // 当前的路由是否在im模块里，若不在im模块里，才显示通知
             if (window.polkVue.$route.name == 'im') {
@@ -437,18 +317,14 @@ export const imServerStore = new Vuex.Store({
             // 1.判断当前通知集合里是否已存在次会话，若已存在去除此会话
             for (var i = 0; i < state.notificationChatEnlist.length; i++) {
                 if (state.notificationChatEnlist[i].clientChatId == chatEn.clientChatId) {
-                    // state.notificationChatEnlist.splice(i, 1);
-                    //41add
-                    context.commit('noti_DELETE_i', i)
+                    state.notificationChatEnlist.splice(i, 1);
                     break;
                 }
             }
 
             // 2.集合最多只能有5个
             if (state.notificationChatEnlist.length > 5) {
-                // state.notificationChatEnlist = state.notificationChatEnlist.splice(4);
-                //41add
-                context.commit('noti_DELETE', 4)
+                state.notificationChatEnlist = state.notificationChatEnlist.splice(4);
             }
 
             // 3.转换后加入到当前通知集合里
@@ -471,9 +347,7 @@ export const imServerStore = new Vuex.Store({
             }
 
             // 5.加入到集合里
-            //state.notificationChatEnlist.push(tmpChatEn);
-            //41add
-            context.commit('noti_ADD', tmpChatEn);
+            state.notificationChatEnlist.push(tmpChatEn);
 
             // 6.当通知数量大于5个时清除通知
             window.imServerStore_notificationList = window.imServerStore_notificationList || [];
@@ -502,7 +376,7 @@ export const imServerStore = new Vuex.Store({
                     tag: Date.now(),
                     icon: ak.BLL.getPngFromWay(item.sourceInfo_way)
                 });
-                notification.onclick = function (e) {
+                notification.onclick = function(e) {
                     window.focus();
                     window.polkVue.$router.push('im');
                     context.commit('clearNotificationChat');
@@ -511,14 +385,11 @@ export const imServerStore = new Vuex.Store({
                     imServerStore_notificationList = [];
                 };
 
-                notification.onclose = function (e) {
+                notification.onclose = function(e) {
                     // remove en
                     for (var i = 0; i < state.notificationChatEnlist.length; i++) {
                         if (state.notificationChatEnlist[i].clientChatId == item.clientChatId) {
-                            //state.notificationChatEnlist.splice(i, 1);
-                            //41add
-                            context.commit('noti_DELETE_i', i)
-
+                            state.notificationChatEnlist.splice(i, 1);
                             break;
                         }
                     }
@@ -531,7 +402,7 @@ export const imServerStore = new Vuex.Store({
                     }
                 };
 
-                setTimeout(function () {
+                setTimeout(function() {
                     notification && notification.close();
                 }, 1000 * 10);
 
@@ -542,89 +413,39 @@ export const imServerStore = new Vuex.Store({
         /**
          * 服务端上线
          */
-        SERVER_ON: function (context, payload) {
-            // context.state.socket = require('socket.io-client')('http://127.0.0.1:3001');
-            //41add
-            context.commit('SOCKET_REQ', require('socket.io-client')('http://theflowchat.com:3001'))
-            context.state.socket.on('connect', function () {
+        SERVER_ON: function(context, payload) {
+            context.state.socket = require('socket.io-client')('https://theflowchat.com:3001');
+            context.state.socket.on('connect', function() {
                 // 服务端上线
                 context.state.socket.emit('SERVER_ON', {
                     serverChatEn: {
                         // serverChatId: context.state.serverChatEn.serverChatId,
                         serverChatId: context.state.serverChatEn.serverChatId,
                         serverChatName: context.state.serverChatEn.serverChatName,
-                        avatarUrl: context.state.serverChatEn.avatarUrl
+                        avatarUrl:context.state.serverChatEn.avatarUrl
                     }
                 });
-                // 載入歷史信息
-                context.state.socket.on('HISTORY_MSG', function (data) {
-                    // context.dispatch('getChatEnByChatId', { clientChatId: data.clientChatEn.clientChatId }).then((chatEn) => {
-                    //     if (chatEn == null) {
-                    //         return;
-                    //     }
-                    //     chatEn.msgList = data.msgList
-                    //     chatEn.lastMsgTime = msg.createTime;
-                    //     switch (msg.contentType) {
-                    //         case 'text':
-                    //             chatEn.lastMsgContent = msg.content;
-                    //             break;
-                    //         case 'image':
-                    //             chatEn.lastMsgContent = '[图片]';
-                    //             break;
-                    //         case 'file':
-                    //             chatEn.lastMsgContent = '[文件]';
-                    //             break;
-                    //         case 'sound':
-                    //             chatEn.lastMsgContent = '[语音]';
-                    //             break;
-                    //     }
-                    //     // 更新列表
-                    //     if (context.state.selectedChatEn && chatEn.clientChatId == context.state.selectedChatEn.clientChatId) {
-                    //         chatEn.newMsgCount = 0;
-                    //         context.state.selectedChatEn = Object.assign({}, chatEn);
-                    //         context.commit('triggerHaveNewMsgDelegate');
-                    //     } else {
-                    //         chatEn.newMsgCount++;
-                    //     }
 
-                    //     // 4.排序
-                    //     context.commit('sortCurrentChatEnlist', {});
-                    // })
-                    // console.log(data.msgList);
-                    // this.$data.chatInfoEn.msgList = data.msgList;
-                });
                 // 访客端上线
-                //41add
-                context.state.socket.on('CLIENT_ON', function (data) {
+                context.state.socket.on('CLIENT_ON', function(data) {
                     // 1)增加客户列表
-                    // context.dispatch('addClientChat', {
-                    //     newChatEn: {
-                    //         clientChatId: data.clientChatEn.clientChatId,
-                    //         clientChatName: data.clientChatEn.clientChatName
-                    //     }
-                    // });
-
-                    //41add
-                    context.dispatch('addChatMsg', {
-                        clientChatId: data.clientChatEn.clientChatId,
-                        msg: {
-                            role: 'sys',
-                            contentType: 'text',
-                            content: '重新连接'
+                    context.dispatch('addClientChat', {
+                        newChatEn: {
+                            clientChatId: data.clientChatEn.clientChatId,
+                            clientChatName: data.clientChatEn.clientChatName
                         }
                     });
                 });
 
                 // 访客端离线
-                //41add
-                context.state.socket.on('CLIENT_OFF', function (data) {
+                context.state.socket.on('CLIENT_OFF', function(data) {
                     // 1)修改客户状态为离线
-                    // context.dispatch('extendChatEn', {
-                    //     clientChatId: data.clientChatEn.clientChatId,
-                    //     extends: {
-                    //         state: 'off'
-                    //     }
-                    // });
+                    context.dispatch('extendChatEn', {
+                        clientChatId: data.clientChatEn.clientChatId,
+                        extends: {
+                            state: 'off'
+                        }
+                    });
 
                     // 2)增加消息
                     context.dispatch('addChatMsg', {
@@ -638,25 +459,15 @@ export const imServerStore = new Vuex.Store({
                 });
 
                 // 访客端发送了信息
-                context.state.socket.on('CLIENT_SEND_MSG', function (data) {
-                    // 1)增加客户列表
-                    //41add
-                    context.dispatch('addClientChat', {
-                        newChatEn: {
-                            clientChatId: data.clientChatEn.clientChatId,
-                            clientChatName: data.clientChatEn.clientChatName
-                        }
-                    }).then(() => {
-                        console.log('server get messanger');
-                        context.dispatch('addChatMsg', {
-                            clientChatId: data.clientChatEn.clientChatId,
-                            msg: data.msg
-                        });
+                context.state.socket.on('CLIENT_SEND_MSG', function(data) {
+                    console.log('server get messanger');
+                    context.dispatch('addChatMsg', {
+                        clientChatId: data.clientChatEn.clientChatId,
+                        msg: data.msg
                     });
-
                 });
                 // 其他客服端发送了信息
-                context.state.socket.on('SERVER_SEND_MSG', function (data) {
+                context.state.socket.on('SERVER_SEND_MSG', function(data) {
                     console.log('other server send messanger');
                     console.log(data)
                     context.dispatch('addChatMsg', {
@@ -664,6 +475,7 @@ export const imServerStore = new Vuex.Store({
                         msg: data.msg
                     });
                 });
+
                 // 离开
                 window.addEventListener('beforeunload', () => {
                     context.dispatch('SERVER_OFF');
@@ -674,7 +486,7 @@ export const imServerStore = new Vuex.Store({
         /**
          * 服务端离线
          */
-        SERVER_OFF: function (context, payload) {
+        SERVER_OFF: function(context, payload) {
             context.state.socket.emit('SERVER_OFF', {
                 serverChatEn: {
                     serverChatId: context.state.serverChatEn.serverChatId,
@@ -682,15 +494,13 @@ export const imServerStore = new Vuex.Store({
                 }
             });
             context.state.socket.close();
-            // context.state.socket = null;
-            //41add
-            context.commit('SOCKET_NULL');
+            context.state.socket = null;
         },
 
         /**
          * 发送消息
          */
-        sendMsg: function (context, { clientChatId, msg }) {
+        sendMsg: function(context, { clientChatId, msg }) {
             console.log(clientChatId);
             context.state.socket.emit('SERVER_SEND_MSG', {
                 serverChatId: context.state.serverChatEn.serverChatId,
@@ -703,34 +513,34 @@ export const imServerStore = new Vuex.Store({
         /**
          * 获取选中的会话对象
          */
-        selectedChatEn: function (state) {
+        selectedChatEn: function(state) {
             return state.selectedChatEn;
         },
 
         /**
          * 当前 未處理会话集合
          */
-        currentChatEnlist: function (state) {
+        currentChatEnlist: function(state) {
             return state.currentChatEnlist;
         },
         // 
         //  已處理對話集合
         // 
-        currentChatEnlist_done: function (state) {
+        currentChatEnlist_done: function(state) {
             return state.currentChatEnlist_done;
         },
 
         /**
          * 选中的chat含有新消息
          */
-        haveNewMsgDelegate: function (state) {
+        haveNewMsgDelegate: function(state) {
             return state.haveNewMsgDelegate;
         },
 
         /**
          * 客服chat信息
          */
-        serverChatEn: function (state) {
+        serverChatEn: function(state) {
             return state.serverChatEn;
         }
     }
