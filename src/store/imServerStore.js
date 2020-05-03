@@ -412,11 +412,12 @@ export const imServerStore = new Vuex.Store({
                             done_ChatEnList: context.state.currentChatEnlist_done
                         },
                         headers: {
-                            "Content-Type": "application/json"
-                        },
-                        httpsAgent: new https.Agent({
-                            rejectUnauthorized: false
-                        })
+                            "Content-Type": "application/json",
+                            httpsAgent: new https.Agent({
+                                rejectUnauthorized: false
+                            })
+
+                        }
                     }).then(response => {
                         console.log(response)
                     })
