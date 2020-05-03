@@ -120,23 +120,23 @@ export default {
     };
   },
   mounted() {
-    axios({
-      method: "post",
-      url: "https://theflowchat.com:3000/api/ChatEn_read",
-      data: {
-        serverChatId: this.storeServerChatEn.serverChatId
-      },
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(response => {
-      //   console.log(response);
-         console.log(JSON.parse(response.data.ChatEnList));
-      this.storeCurrentChatEnlist = JSON.parse(response.data.ChatEnList);
-      this.storeCurrentChatEnlist_done = JSON.parse(
-        response.data.done_ChatEnList
-      );
-    });
+    // axios({
+    //   method: "post",
+    //   url: "https://theflowchat.com:3000/api/ChatEn_read",
+    //   data: {
+    //     serverChatId: this.storeServerChatEn.serverChatId
+    //   },
+    //   headers: {
+    //     "Content-Type": "application/json"
+    //   }
+    // }).then(response => {
+    //   //   console.log(response);
+    //      console.log(JSON.parse(response.data.ChatEnList));
+    //   this.storeCurrentChatEnlist = JSON.parse(response.data.ChatEnList);
+    //   this.storeCurrentChatEnlist_done = JSON.parse(
+    //     response.data.done_ChatEnList
+    //   );
+    // });
   },
   computed: {
     selectedChatEn() {
