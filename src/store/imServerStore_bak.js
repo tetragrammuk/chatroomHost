@@ -12,8 +12,8 @@ export const imServerStore = new Vuex.Store({
     // strict: true,
     state: {
         serverChatEn: {
-            serverChatId: 'ieat',
-            serverChatName: 'ieat',
+            serverChatId: 'Mr.Demo',
+            serverChatName: 'Mr.Demo',
             avatarUrl: '/static/image/im_server_avatar.png'
         },
         selectedChatEn: null, // 选取的会话对象
