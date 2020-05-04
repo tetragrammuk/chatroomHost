@@ -403,20 +403,19 @@ export const imServerStore = new Vuex.Store({
                             break;
                         }
                     }
+                    let jsonData = {
+                        serverChatId: context.state.serverChatEn.serverChatId,
+                        ChatEnList: context.state.currentChatEnlist,
+                        done_ChatEnList: context.state.currentChatEnlist_done
+                    }
+                    console.log("ChatEn_update")
+                    console.log(jsonData)
                     axios({
                         method: "post",
                         url: "https://theflowchat.com:3001/api/ChatEn_update",
-                        data: {
-                            serverChatId: context.state.serverChatEn.serverChatId,
-                            ChatEnList: context.state.currentChatEnlist,
-                            done_ChatEnList: context.state.currentChatEnlist_done
-                        },
+                        data: jsonData,
                         headers: {
                             "Content-Type": "application/json",
-                            httpsAgent: new https.Agent({
-                                rejectUnauthorized: false
-                            })
-
                         }
                     }).then(response => {
                         console.log(response)
