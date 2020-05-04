@@ -558,6 +558,8 @@ export const imServerStore = new Vuex.Store({
                 }
             ).then(res => {
                 console.log(token);
+                console.log(res);
+                console.log(res.data.userList.name);
                 alert("得到Server Name=" + res.data.userList.name);
                 // store.commit("SET_ROLES",userList.roles);
                 // store.commit("SET_AVATAR",userList.avatar);
