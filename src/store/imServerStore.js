@@ -549,7 +549,7 @@ export const imServerStore = new Vuex.Store({
          */
         SERVER_ON: function (context, payload) {
             let token = getToken('Token');
-            axios.post('https://flow-platform-dot-flow-263607.appspot.com/token_data',
+            axios.post('https://test-backend-dot-flow-263607.appspot.com/token_data',
                 { "token": token },
                 {
                     headers: {
