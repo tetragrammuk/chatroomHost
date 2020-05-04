@@ -286,13 +286,16 @@ export const imServerStore = new Vuex.Store({
                 // 实际场景中，在消息上方是否显示时间是由后台传递给前台的消息中附加上的，可参考 微信Web版
                 // 此处进行手动设置，5分钟之内的消息，只显示一次消息
                 msg.createTime = new Date(msg.createTime);
-                if (chatEn.lastMsgShowTime == null || msg.createTime.getTime() - chatEn.lastMsgShowTime.getTime() > 1000 * 60 * 5) {
+                let tmpTime = Date.parse(chatEn.lastMsgShowTime);
+                tmpTime = new Date(tmpTime)
+
+                if (tmpTime == null || msg.createTime.getTime() - tmpTime.getTime() > 1000 * 60 * 5) {
                     msgList.push({
                         role: 'sys',
                         contentType: 'text',
                         content: ak.Utils.getDateTimeStr(msg.createTime, 'H:i')
                     });
-                    chatEn.lastMsgShowTime = msg.createTime;
+                    tmpTime = msg.createTime;
                 }
 
                 // 2)插入消息
