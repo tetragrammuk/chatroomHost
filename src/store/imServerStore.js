@@ -170,7 +170,7 @@ export const imServerStore = new Vuex.Store({
 
                     axios({
                         method: "post",
-                        url: "https://theflowchat.com:3000/api/ChatEn_update",
+                        url: "https://theflowchat.com:3001/api/ChatEn_update",
                         data: {
                             serverChatId: context.state.serverChatEn.serverChatId,
                             ChatEnList: context.state.currentChatEnlist,
@@ -329,7 +329,7 @@ export const imServerStore = new Vuex.Store({
                 // 41add api
                 axios({
                     method: "post",
-                    url: "https://theflowchat.com:3000/api/ChatEn_update",
+                    url: "https://theflowchat.com:3001/api/ChatEn_update",
                     data: {
                         serverChatId: context.state.serverChatEn.serverChatId,
                         ChatEnList: context.state.currentChatEnlist,
@@ -366,7 +366,7 @@ export const imServerStore = new Vuex.Store({
                 //41add
                 axios({
                     method: "post",
-                    url: "https://theflowchat.com:3000/api/msgList_read",
+                    url: "https://theflowchat.com:3001/api/msgList_read",
                     data: {
                         serverChatId: context.state.serverChatEn.serverChatId,
                         clientChatId: clientChatId
@@ -405,7 +405,7 @@ export const imServerStore = new Vuex.Store({
                     }
                     axios({
                         method: "post",
-                        url: "https://theflowchat.com:3000/api/ChatEn_update",
+                        url: "https://theflowchat.com:3001/api/ChatEn_update",
                         data: {
                             serverChatId: context.state.serverChatEn.serverChatId,
                             ChatEnList: context.state.currentChatEnlist,
