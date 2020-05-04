@@ -295,7 +295,7 @@ export const imServerStore = new Vuex.Store({
                         contentType: 'text',
                         content: ak.Utils.getDateTimeStr(msg.createTime, 'H:i')
                     });
-                    tmpTime = msg.createTime;
+                    chatEn.lastMsgShowTime = msg.createTime;
                 }
 
                 // 2)插入消息
