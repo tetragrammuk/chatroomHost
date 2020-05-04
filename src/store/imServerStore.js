@@ -167,15 +167,17 @@ export const imServerStore = new Vuex.Store({
                     //context.state.currentChatEnlist.push(newChatEn);
                     //41add
                     context.commit('ClientChat_ADD', newChatEn);
-
+                    let jsonData = {
+                        serverChatId: context.state.serverChatEn.serverChatId,
+                        ChatEnList: context.state.currentChatEnlist,
+                        done_ChatEnList: context.state.currentChatEnlist_done
+                    }
+                    console.log("ChatEn_update")
+                    console.log(jsonData)
                     axios({
                         method: "post",
                         url: "https://theflowchat.com:3001/api/ChatEn_update",
-                        data: {
-                            serverChatId: context.state.serverChatEn.serverChatId,
-                            ChatEnList: context.state.currentChatEnlist,
-                            done_ChatEnList: context.state.currentChatEnlist_done
-                        },
+                        data: jsonData,
                         headers: {
                             "Content-Type": "application/json"
                         }
@@ -327,14 +329,16 @@ export const imServerStore = new Vuex.Store({
                 context.commit('sortCurrentChatEnlist', {});
                 //console.log(context.state.currentChatEnlist) 
                 // 41add api
+                let jsonData = {
+                    serverChatId: context.state.serverChatEn.serverChatId,
+                    ChatEnList: context.state.currentChatEnlist,
+                    done_ChatEnList: context.state.currentChatEnlist_done
+                }
+
                 axios({
                     method: "post",
                     url: "https://theflowchat.com:3001/api/ChatEn_update",
-                    data: {
-                        serverChatId: context.state.serverChatEn.serverChatId,
-                        ChatEnList: context.state.currentChatEnlist,
-                        done_ChatEnList: context.state.currentChatEnlist_done
-                    },
+                    data: jsonData,
                     headers: {
                         "Content-Type": "application/json"
                     }
