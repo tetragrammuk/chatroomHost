@@ -6,7 +6,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import ak from '@/common/ak.js';
 import axios from 'axios';
-import { getToken } from '@/common/auth';
 Vue.use(Vuex);
 export const imServerStore = new Vuex.Store({
     //41add
@@ -168,15 +167,17 @@ export const imServerStore = new Vuex.Store({
                     //context.state.currentChatEnlist.push(newChatEn);
                     //41add
                     context.commit('ClientChat_ADD', newChatEn);
-
+                    let jsonData = {
+                        serverChatId: context.state.serverChatEn.serverChatId,
+                        ChatEnList: context.state.currentChatEnlist,
+                        done_ChatEnList: context.state.currentChatEnlist_done
+                    }
+                    console.log("ChatEn_update")
+                    console.log(jsonData)
                     axios({
                         method: "post",
                         url: "https://theflowchat.com:3001/api/ChatEn_update",
-                        data: {
-                            serverChatId: context.state.serverChatEn.serverChatId,
-                            ChatEnList: context.state.currentChatEnlist,
-                            done_ChatEnList: context.state.currentChatEnlist_done
-                        },
+                        data: jsonData,
                         headers: {
                             "Content-Type": "application/json"
                         }
@@ -328,14 +329,16 @@ export const imServerStore = new Vuex.Store({
                 context.commit('sortCurrentChatEnlist', {});
                 //console.log(context.state.currentChatEnlist) 
                 // 41add api
+                let jsonData = {
+                    serverChatId: context.state.serverChatEn.serverChatId,
+                    ChatEnList: context.state.currentChatEnlist,
+                    done_ChatEnList: context.state.currentChatEnlist_done
+                }
+
                 axios({
                     method: "post",
                     url: "https://theflowchat.com:3001/api/ChatEn_update",
-                    data: {
-                        serverChatId: context.state.serverChatEn.serverChatId,
-                        ChatEnList: context.state.currentChatEnlist,
-                        done_ChatEnList: context.state.currentChatEnlist_done
-                    },
+                    data: jsonData,
                     headers: {
                         "Content-Type": "application/json"
                     }
@@ -404,20 +407,19 @@ export const imServerStore = new Vuex.Store({
                             break;
                         }
                     }
+                    let jsonData = {
+                        serverChatId: context.state.serverChatEn.serverChatId,
+                        ChatEnList: context.state.currentChatEnlist,
+                        done_ChatEnList: context.state.currentChatEnlist_done
+                    }
+                    console.log("ChatEn_update")
+                    console.log(jsonData)
                     axios({
                         method: "post",
                         url: "https://theflowchat.com:3001/api/ChatEn_update",
-                        data: {
-                            serverChatId: context.state.serverChatEn.serverChatId,
-                            ChatEnList: context.state.currentChatEnlist,
-                            done_ChatEnList: context.state.currentChatEnlist_done
-                        },
+                        data: jsonData,
                         headers: {
                             "Content-Type": "application/json",
-                            httpsAgent: new https.Agent({
-                                rejectUnauthorized: false
-                            })
-
                         }
                     }).then(response => {
                         console.log(response)
@@ -548,153 +550,132 @@ export const imServerStore = new Vuex.Store({
          * 服务端上线
          */
         SERVER_ON: function (context, payload) {
-            let token = getToken('Token');
-            axios.post('https://flow-platform-dot-flow-263607.appspot.com/token_data',
-                { "token": token },
-                {
-                    headers: {
-                        'x-access-token': token
+            // context.state.socket = require('socket.io-client')('http://127.0.0.1:3001');
+            //41add
+            context.commit('SOCKET_REQ', require('socket.io-client')('https://theflowchat.com:3001'))
+            context.state.socket.on('connect', function () {
+                // 服务端上线
+                context.state.socket.emit('SERVER_ON', {
+                    serverChatEn: {
+                        // serverChatId: context.state.serverChatEn.serverChatId,
+                        serverChatId: context.state.serverChatEn.serverChatId,
+                        serverChatName: context.state.serverChatEn.serverChatName,
+                        avatarUrl: context.state.serverChatEn.avatarUrl
                     }
-                }
-            ).then(res => {
-                console.log(token);
-                alert("得到Server Name=" + res.data.userList.name);
-                // store.commit("SET_ROLES",userList.roles);
-                // store.commit("SET_AVATAR",userList.avatar);
+                });
+                // 載入歷史信息
+                context.state.socket.on('HISTORY_MSG', function (data) {
+                    // context.dispatch('getChatEnByChatId', { clientChatId: data.clientChatEn.clientChatId }).then((chatEn) => {
+                    //     if (chatEn == null) {
+                    //         return;
+                    //     }
+                    //     chatEn.msgList = data.msgList
+                    //     chatEn.lastMsgTime = msg.createTime;
+                    //     switch (msg.contentType) {
+                    //         case 'text':
+                    //             chatEn.lastMsgContent = msg.content;
+                    //             break;
+                    //         case 'image':
+                    //             chatEn.lastMsgContent = '[图片]';
+                    //             break;
+                    //         case 'file':
+                    //             chatEn.lastMsgContent = '[文件]';
+                    //             break;
+                    //         case 'sound':
+                    //             chatEn.lastMsgContent = '[语音]';
+                    //             break;
+                    //     }
+                    //     // 更新列表
+                    //     if (context.state.selectedChatEn && chatEn.clientChatId == context.state.selectedChatEn.clientChatId) {
+                    //         chatEn.newMsgCount = 0;
+                    //         context.state.selectedChatEn = Object.assign({}, chatEn);
+                    //         context.commit('triggerHaveNewMsgDelegate');
+                    //     } else {
+                    //         chatEn.newMsgCount++;
+                    //     }
 
-                // context.state.socket = require('socket.io-client')('http://127.0.0.1:3001');
+                    //     // 4.排序
+                    //     context.commit('sortCurrentChatEnlist', {});
+                    // })
+                    // console.log(data.msgList);
+                    // this.$data.chatInfoEn.msgList = data.msgList;
+                });
+                // 访客端上线
                 //41add
-                context.commit('SOCKET_REQ', require('socket.io-client')('https://theflowchat.com:3001'))
-                context.state.socket.on('connect', function () {
-                    // 服务端上线
-                    context.state.socket.emit('SERVER_ON', {
-                        serverChatEn: {
-                            // serverChatId: context.state.serverChatEn.serverChatId,
-                            serverChatId: context.state.serverChatEn.serverChatId,
-                            serverChatName: context.state.serverChatEn.serverChatName,
-                            avatarUrl: context.state.serverChatEn.avatarUrl
+                context.state.socket.on('CLIENT_ON', function (data) {
+                    // 1)增加客户列表
+                    // context.dispatch('addClientChat', {
+                    //     newChatEn: {
+                    //         clientChatId: data.clientChatEn.clientChatId,
+                    //         clientChatName: data.clientChatEn.clientChatName
+                    //     }
+                    // });
 
-
+                    //41add
+                    context.dispatch('addChatMsg', {
+                        clientChatId: data.clientChatEn.clientChatId,
+                        msg: {
+                            role: 'sys',
+                            contentType: 'text',
+                            content: '重新连接'
                         }
-                    });
-                    // 載入歷史信息
-                    context.state.socket.on('HISTORY_MSG', function (data) {
-                        // context.dispatch('getChatEnByChatId', { clientChatId: data.clientChatEn.clientChatId }).then((chatEn) => {
-                        //     if (chatEn == null) {
-                        //         return;
-                        //     }
-                        //     chatEn.msgList = data.msgList
-                        //     chatEn.lastMsgTime = msg.createTime;
-                        //     switch (msg.contentType) {
-                        //         case 'text':
-                        //             chatEn.lastMsgContent = msg.content;
-                        //             break;
-                        //         case 'image':
-                        //             chatEn.lastMsgContent = '[图片]';
-                        //             break;
-                        //         case 'file':
-                        //             chatEn.lastMsgContent = '[文件]';
-                        //             break;
-                        //         case 'sound':
-                        //             chatEn.lastMsgContent = '[语音]';
-                        //             break;
-                        //     }
-                        //     // 更新列表
-                        //     if (context.state.selectedChatEn && chatEn.clientChatId == context.state.selectedChatEn.clientChatId) {
-                        //         chatEn.newMsgCount = 0;
-                        //         context.state.selectedChatEn = Object.assign({}, chatEn);
-                        //         context.commit('triggerHaveNewMsgDelegate');
-                        //     } else {
-                        //         chatEn.newMsgCount++;
-                        //     }
-
-                        //     // 4.排序
-                        //     context.commit('sortCurrentChatEnlist', {});
-                        // })
-                        // console.log(data.msgList);
-                        // this.$data.chatInfoEn.msgList = data.msgList;
-                    });
-                    // 访客端上线
-                    //41add
-                    context.state.socket.on('CLIENT_ON', function (data) {
-                        // 1)增加客户列表
-                        // context.dispatch('addClientChat', {
-                        //     newChatEn: {
-                        //         clientChatId: data.clientChatEn.clientChatId,
-                        //         clientChatName: data.clientChatEn.clientChatName
-                        //     }
-                        // });
-
-                        //41add
-                        context.dispatch('addChatMsg', {
-                            clientChatId: data.clientChatEn.clientChatId,
-                            msg: {
-                                role: 'sys',
-                                contentType: 'text',
-                                content: '重新连接'
-                            }
-                        });
-                    });
-
-                    // 访客端离线
-                    //41add
-                    context.state.socket.on('CLIENT_OFF', function (data) {
-                        // 1)修改客户状态为离线
-                        // context.dispatch('extendChatEn', {
-                        //     clientChatId: data.clientChatEn.clientChatId,
-                        //     extends: {
-                        //         state: 'off'
-                        //     }
-                        // });
-
-                        // 2)增加消息
-                        context.dispatch('addChatMsg', {
-                            clientChatId: data.clientChatEn.clientChatId,
-                            msg: {
-                                role: 'sys',
-                                contentType: 'text',
-                                content: '客戶斷線'
-                            }
-                        });
-                    });
-
-                    // 访客端发送了信息
-                    context.state.socket.on('CLIENT_SEND_MSG', function (data) {
-                        // 1)增加客户列表
-                        //41add
-                        context.dispatch('addClientChat', {
-                            newChatEn: {
-                                clientChatId: data.clientChatEn.clientChatId,
-                                clientChatName: data.clientChatEn.clientChatName
-                            }
-                        }).then(() => {
-                            console.log('server get messanger');
-                            context.dispatch('addChatMsg', {
-                                clientChatId: data.clientChatEn.clientChatId,
-                                msg: data.msg
-                            });
-                        });
-
-                    });
-                    // 其他客服端发送了信息
-                    context.state.socket.on('SERVER_SEND_MSG', function (data) {
-                        console.log('other server send messanger');
-                        console.log(data)
-                        context.dispatch('addChatMsg', {
-                            clientChatId: data.clientChatId,
-                            msg: data.msg
-                        });
-                    });
-                    // 离开
-                    window.addEventListener('beforeunload', () => {
-                        context.dispatch('SERVER_OFF');
                     });
                 });
 
+                // 访客端离线
+                //41add
+                context.state.socket.on('CLIENT_OFF', function (data) {
+                    // 1)修改客户状态为离线
+                    // context.dispatch('extendChatEn', {
+                    //     clientChatId: data.clientChatEn.clientChatId,
+                    //     extends: {
+                    //         state: 'off'
+                    //     }
+                    // });
 
-            }).catch((err) => { // Token 過期或者 錯誤
-            })
+                    // 2)增加消息
+                    context.dispatch('addChatMsg', {
+                        clientChatId: data.clientChatEn.clientChatId,
+                        msg: {
+                            role: 'sys',
+                            contentType: 'text',
+                            content: '客戶斷線'
+                        }
+                    });
+                });
 
+                // 访客端发送了信息
+                context.state.socket.on('CLIENT_SEND_MSG', function (data) {
+                    // 1)增加客户列表
+                    //41add
+                    context.dispatch('addClientChat', {
+                        newChatEn: {
+                            clientChatId: data.clientChatEn.clientChatId,
+                            clientChatName: data.clientChatEn.clientChatName
+                        }
+                    }).then(() => {
+                        console.log('server get messanger');
+                        context.dispatch('addChatMsg', {
+                            clientChatId: data.clientChatEn.clientChatId,
+                            msg: data.msg
+                        });
+                    });
+
+                });
+                // 其他客服端发送了信息
+                context.state.socket.on('SERVER_SEND_MSG', function (data) {
+                    console.log('other server send messanger');
+                    console.log(data)
+                    context.dispatch('addChatMsg', {
+                        clientChatId: data.clientChatId,
+                        msg: data.msg
+                    });
+                });
+                // 离开
+                window.addEventListener('beforeunload', () => {
+                    context.dispatch('SERVER_OFF');
+                });
+            });
         },
 
         /**
