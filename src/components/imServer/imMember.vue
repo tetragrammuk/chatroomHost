@@ -1,7 +1,7 @@
 <!-- 會員資料 -->
 <template>
     <div class="imRecord-wrapper">
-                <el-form ref="form"  label-width="120px" :rules="rules">
+                <el-form ref="form"  label-width="120px">
                     <el-form-item label="Line頭相">
                         <el-col :span="5">
                         <img  :src="selectedChatEn.clientChatId" style="width: 5vw;height: 5vw">
