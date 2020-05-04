@@ -417,10 +417,6 @@ export const imServerStore = new Vuex.Store({
                         },
                         headers: {
                             "Content-Type": "application/json",
-                            httpsAgent: new https.Agent({
-                                rejectUnauthorized: false
-                            })
-
                         }
                     }).then(response => {
                         console.log(response)
