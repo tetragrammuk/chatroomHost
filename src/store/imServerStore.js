@@ -144,6 +144,9 @@ export const imServerStore = new Vuex.Store({
         UPDATE_CHATLIST_DONE: function (state, data) {
             state.currentChatEnlist_done = data;
         },
+        SERVER_ID_UPDATE: function (state, data) {
+            state.serverChatEn.serverChatId = data;
+        },
     },
     actions: {
 
@@ -557,10 +560,7 @@ export const imServerStore = new Vuex.Store({
                     }
                 }
             ).then(res => {
-                console.log(token);
-                console.log(res);
-                console.log(res.data.userList.name);
-                alert("得到Server Name=" + res.data.userList.name);
+                context.commit('SERVER_ID_UPDATE', res.data.userList.name);
                 // store.commit("SET_ROLES",userList.roles);
                 // store.commit("SET_AVATAR",userList.avatar);
 
