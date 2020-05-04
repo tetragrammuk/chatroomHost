@@ -627,6 +627,13 @@ export const imServerStore = new Vuex.Store({
                         // });
 
                         //41add
+                        context.dispatch('extendChatEn', {
+                            clientChatId: data.clientChatEn.clientChatId,
+                            extends: {
+                                state: 'on'
+                            }
+                        });
+                        //41add
                         context.dispatch('addChatMsg', {
                             clientChatId: data.clientChatEn.clientChatId,
                             msg: {
@@ -641,12 +648,12 @@ export const imServerStore = new Vuex.Store({
                     //41add
                     context.state.socket.on('CLIENT_OFF', function (data) {
                         // 1)修改客户状态为离线
-                        // context.dispatch('extendChatEn', {
-                        //     clientChatId: data.clientChatEn.clientChatId,
-                        //     extends: {
-                        //         state: 'off'
-                        //     }
-                        // });
+                        context.dispatch('extendChatEn', {
+                            clientChatId: data.clientChatEn.clientChatId,
+                            extends: {
+                                state: 'off'
+                            }
+                        });
 
                         // 2)增加消息
                         context.dispatch('addChatMsg', {
