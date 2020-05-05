@@ -63,7 +63,7 @@
                             <i class="iconfont fa fa-file-o"></i>
                         </a>
                         <form method="post" enctype="multipart/form-data">
-                            <input type="file" name="uploadFile" id="common_chat_opr_fileUpload" style="display:none;position:absolute;left:0;top:0;width:0%;height:0%;opacity:0;">
+                            <input type="file" accept="image/*" name="image" id="common_chat_opr_fileUpload" style="display:none;position:absolute;left:0;top:0;width:0%;height:0%;opacity:0;">
                         </form>
                     </div>
                     <!-- 聊天输入框 -->
@@ -92,6 +92,7 @@
 
 <script>
 import common_chat_emoji from './common_chat_emoji.vue';
+import axios from "axios";
 
 export default {
     components: {
@@ -133,8 +134,7 @@ export default {
             var self = this;
             // 初始化状态
             document.getElementById('common_chat_input').innerHTML = '';
-            //41add
-            //self.$refs.qqemoji.$data.faceHidden = true;
+            self.$refs.qqemoji.$data.faceHidden = true;
 
             // 在线状态
             if (this.chatInfoEn.state == 'on') {
@@ -391,6 +391,7 @@ export default {
             var fileNameIndex = document.getElementById('common_chat_opr_fileUpload').value.lastIndexOf('\\') + 1;
             var fileName = document.getElementById('common_chat_opr_fileUpload').value.substr(fileNameIndex);
             var extend = fileName.substring(fileName.lastIndexOf('.') + 1);
+            
             // 1.判断有效
             // 1)大小
             if (document.getElementById('common_chat_opr_fileUpload').files[0].size >= 1000 * 1000 * 10) {
@@ -402,21 +403,47 @@ export default {
             // 2.文件上传
             let formData = new FormData();
             
-            formData.append('uploadFile', document.getElementById('common_chat_opr_fileUpload').files[0]);
-            this.$http.uploadFile({
-                url: '/upload',
-                params: formData,
-                successCallback: (rs) => {
-                    console.log(rs);
-                    document.getElementById('common_chat_opr_fileUpload').value = '';
-                    this.sendMsg({
-                        contentType: ['png', 'jpg', 'jpeg', 'gif', 'bmp'].indexOf(extend) >= 0 ? 'image' : 'file',
-                        fileName: fileName,
-                        fileUrl: rs.fileUrl,
-                        state: 'success'
-                    });
-                }
+            formData.append('image', document.getElementById('common_chat_opr_fileUpload').files[0]);
+            console.log(document.getElementById('common_chat_opr_fileUpload').files[0]);
+            console.log(formData);
+
+            axios({
+                method: "post",
+                url: "https://api.imgur.com/3/image",
+                data: formData,
+                headers: {
+                Authorization: "Client-ID 144a5de7a410723"
+                },
+                mimeType: "multipart/form-data"
+            }).then(rs => {
+                console.log(rs.data.data.link);
+                document.getElementById('common_chat_opr_fileUpload').value = '';
+                this.sendMsg({
+                    contentType: ['png', 'jpg', 'jpeg', 'gif', 'bmp'].indexOf(extend) >= 0 ? 'image' : 'file',
+                    fileName: fileName,
+                    fileUrl: rs.data.data.link,
+                    state: 'success'
+                });
+
             });
+
+
+
+
+            // this.$http.uploadFile({
+            //     url: '/upload',
+            //     params: formData,
+            //     successCallback: (rs) => {
+            //         console.log(rs);
+            //         document.getElementById('common_chat_opr_fileUpload').value = '';
+            //         this.sendMsg({
+            //             contentType: ['png', 'jpg', 'jpeg', 'gif', 'bmp'].indexOf(extend) >= 0 ? 'image' : 'file',
+            //             fileName: fileName,
+            //             fileUrl: rs.fileUrl,
+            //             state: 'success'
+            //         });
+            //     }
+            // });
         },
 
         /**
