@@ -3,7 +3,7 @@
   <div class="imRecord-wrapper">
     <header class="header">
       <div class="kf-info-wrapper">
-        <img class="kf-avatar" :src="storeServerChatEn.avatarUrl" />
+        <img class="kf-avatar" :src="storeServerChatEn.avatarUrl">
         <span class="kf-name position-h-v-mid">{{storeServerChatEn.serverChatName}}</span>
       </div>
       <div class="client-info-wrapper">
@@ -120,23 +120,7 @@ export default {
     };
   },
   mounted() {
-    axios({
-      method: "post",
-      url: "https://theflowchat.com:3001/api/ChatEn_read",
-      data: {
-        serverChatId: this.storeServerChatEn.serverChatId
-      },
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(response => {
-      //   console.log(response);
-         console.log(JSON.parse(response.data.ChatEnList));
-      this.storeCurrentChatEnlist = JSON.parse(response.data.ChatEnList);
-      this.storeCurrentChatEnlist_done = JSON.parse(
-        response.data.done_ChatEnList
-      );
-    });
+    this.getChatEn();
   },
   computed: {
     selectedChatEn() {
@@ -165,6 +149,26 @@ export default {
   },
   watch: {},
   methods: {
+    getChatEn() {
+      axios({
+        method: "post",
+        url: "https://theflowchat.com:3001/api/ChatEn_read",
+        data: {
+          serverChatId: this.storeServerChatEn.serverChatId
+        },
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }).then(response => {
+        //   console.log(response);
+        console.log(JSON.parse(response.data.ChatEnList));
+        this.storeCurrentChatEnlist = JSON.parse(response.data.ChatEnList);
+        this.storeCurrentChatEnlist_done = JSON.parse(
+          response.data.done_ChatEnList
+        );
+      });
+    },
+
     /**
      * 选中当前列表的chat
      * @param {Object} en call实体类
