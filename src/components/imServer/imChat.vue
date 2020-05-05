@@ -7,12 +7,14 @@
             <span class="time">{{getAccessTimeStr(storeSelectedChatEn.accessTime)}}</span>
             <span v-show="storeSelectedChatEn.state=='on' " class="on-line">在線</span>
             <span v-show="storeSelectedChatEn.state=='off' " class="off-line ">離線</span>
-            <el-button v-if="storeCurrentChatEnlist_done.map(function(item, index) {
-                    return item.clientChatId;
-                  }).indexOf(storeSelectedChatEn.clientChatId)==-1" class ="done" type="primary" @click="done_change">移到已處理</el-button>
-            <el-button v-if="storeCurrentChatEnlist_done.map(function(item, index) {
-                    return item.clientChatId;
-                  }).indexOf(storeSelectedChatEn.clientChatId)!=-1" class ="done" type="primary" @click="non_done_change">移到未處理</el-button>
+            <div class="button">
+                <el-button v-if="storeCurrentChatEnlist_done.map(function(item, index) {
+                        return item.clientChatId;
+                    }).indexOf(storeSelectedChatEn.clientChatId)==-1" class ="done" type="primary" @click="done_change">移到已處理</el-button>
+                <el-button v-if="storeCurrentChatEnlist_done.map(function(item, index) {
+                        return item.clientChatId;
+                    }).indexOf(storeSelectedChatEn.clientChatId)!=-1" class ="done" type="primary" @click="non_done_change">移到未處理</el-button>
+            </div>
         </header>
         <main class="imChat-main">
             <!-- 聊天框区域 -->
@@ -123,6 +125,9 @@ export default {
         }
         .off-line {
             color: #bbbbbb;
+        }
+        .button {
+            margin-right: 0px;
         }
     }
     .imChat-main {

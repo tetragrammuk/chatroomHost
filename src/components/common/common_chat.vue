@@ -841,7 +841,7 @@ export default {
             }
         }
         .common_chat-footer {
-            height: 7.5%;
+            height: 20%;
             display:flex;
             justify-content:space-between;
             width: 100%;
@@ -871,7 +871,7 @@ export default {
                 max-width:75%;
                 .inputContent {
                     padding: 2px;
-                    height: 20px;
+                    height: 100px;
                     font-size: 16px;
                     resize: none;
                     overflow: auto;
