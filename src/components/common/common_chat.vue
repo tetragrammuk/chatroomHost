@@ -134,7 +134,7 @@ export default {
             var self = this;
             // 初始化状态
             document.getElementById('common_chat_input').innerHTML = '';
-            self.$refs.qqemoji.$data.faceHidden = true;
+            //self.$refs.qqemoji.$data.faceHidden = true;
 
             // 在线状态
             if (this.chatInfoEn.state == 'on') {
